@@ -112,6 +112,8 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Site.css" />
+    <Content Include="CRUDUsingDataSet.aspx" />
+    <Content Include="CRUDUsingDataSource.aspx" />
     <Content Include="dSImplementations.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -175,6 +177,20 @@
     </Compile>
     <Compile Include="CacheDataSet.aspx.designer.cs">
       <DependentUpon>CacheDataSet.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CRUDUsingDataSet.aspx.cs">
+      <DependentUpon>CRUDUsingDataSet.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CRUDUsingDataSet.aspx.designer.cs">
+      <DependentUpon>CRUDUsingDataSet.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CRUDUsingDataSource.aspx.cs">
+      <DependentUpon>CRUDUsingDataSource.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CRUDUsingDataSource.aspx.designer.cs">
+      <DependentUpon>CRUDUsingDataSource.aspx</DependentUpon>
     </Compile>
     <Compile Include="dSImplementations.aspx.cs">
       <DependentUpon>dSImplementations.aspx</DependentUpon>

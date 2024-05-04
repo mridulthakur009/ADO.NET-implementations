@@ -34,8 +34,7 @@ namespace ADO.NET_implementations
 
                 //GridViewCategories.DataSource = ds.Tables[1];
                 GridViewCategories.DataSource = ds.Tables["Category"];
-
-                
+                                
                 GridViewCategories.DataBind();
 
             }
