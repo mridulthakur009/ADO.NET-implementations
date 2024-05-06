@@ -12,6 +12,7 @@ namespace ADO.NET_implementations
 {
     public partial class CRUDUsingDataSet : System.Web.UI.Page
     {
+        string CS = ConfigurationManager.ConnectionStrings["DBConnectionString"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -19,7 +20,6 @@ namespace ADO.NET_implementations
 
         private void GetDataFromDB()
         {
-            string CS = ConfigurationManager.ConnectionStrings["DBCS"].ConnectionString;
             SqlConnection con = new SqlConnection(CS);
 
             string strSelectQuery = "Select * from tblStudents";
@@ -39,10 +39,8 @@ namespace ADO.NET_implementations
         private void GetDataFromCache()
         {
             if(Cache["DATASET"] != null)
-            {
-                DataSet ds = new DataSet();
-
-                gvStudents.DataSource = ds;
+            {            
+                gvStudents.DataSource = (DataSet)Cache["DATASET"]; 
                 gvStudents.DataBind();
             }
         }
@@ -69,20 +67,59 @@ namespace ADO.NET_implementations
                 dr["TotalMarks"] = e.NewValues["TotalMarks"];
 
                 Cache.Insert("DATASET", ds, null, DateTime.Now.AddDays(1), System.Web.Caching.Cache.NoSlidingExpiration);
-                gvStudents.EditIndex = -1; //Bring row from the editing mode after updating
+                gvStudents.EditIndex = -1; //Bring row out of editing mode
                 GetDataFromCache();
             }
         }
 
         protected void gvStudents_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
-            gvStudents.EditIndex = -1;
+            gvStudents.EditIndex = -1; //Bring row out of editing mode
             GetDataFromCache();
         }
 
         protected void gvStudents_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
+            if (Cache["DATASET"] != null)
+            {
+                DataSet ds = (DataSet)Cache["DATASET"];
+                DataRow dr = ds.Tables["Students"].Rows.Find(e.Keys["ID"]);
+                dr.Delete();
 
+                Cache.Insert("DATASET", ds, null, DateTime.Now.AddDays(1), System.Web.Caching.Cache.NoSlidingExpiration);
+                
+                GetDataFromCache();
+            }
+        }
+
+        protected void UpdateDataInDb_Click(object sender, EventArgs e)
+        {
+            SqlConnection con = new SqlConnection(CS);
+
+            string strSelectQuery = "Select * from tblStudents";
+
+            SqlDataAdapter da = new SqlDataAdapter(strSelectQuery, con);
+
+            DataSet ds = (DataSet)Cache["DATASET"];
+
+            string strUpdateCommand = "Update tblStudents set Name= @Name, Gender = @Gender, TotalMarks = @TotalMarks where Id = @Id";
+            SqlCommand updateCommand = new SqlCommand(strUpdateCommand, con);
+            updateCommand.Parameters.Add("@Name", SqlDbType.NVarChar, 50, "Name");
+            updateCommand.Parameters.Add("@Gender", SqlDbType.NVarChar, 20, "Gender");
+            updateCommand.Parameters.Add("@TotalMarks", SqlDbType.Int, 0, "TotalMarks");
+            updateCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+            da.UpdateCommand = updateCommand;
+
+            string strDeleteCommand = "Delete from tblStudents where Id = @Id";
+            SqlCommand deleteCommand = new SqlCommand(strDeleteCommand, con);
+            deleteCommand.Parameters.Add("@Id", SqlDbType.Int, 0, "Id");
+
+            da.DeleteCommand = deleteCommand;
+
+            da.Update(ds, "Students");
+
+            Label1.Text = "Database Table Updated";
         }
     }
 }
