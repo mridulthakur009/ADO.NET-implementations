@@ -27,12 +27,12 @@ namespace ADO.NET_implementations
                 ds.Tables[0].TableName = "Product";
                 ds.Tables[1].TableName = "Category";
 
-                //GridViewProducts.DataSource = ds.Tables[0];
+                //GridViewProducts.DataSource = ds.Tables[0]; //We can call data table from their indexes
                 GridViewProducts.DataSource = ds.Tables["Product"];
 
                 GridViewProducts.DataBind();
 
-                //GridViewCategories.DataSource = ds.Tables[1];
+                //GridViewCategories.DataSource = ds.Tables[1]; //We can call data table from their indexes
                 GridViewCategories.DataSource = ds.Tables["Category"];
                                 
                 GridViewCategories.DataBind();
