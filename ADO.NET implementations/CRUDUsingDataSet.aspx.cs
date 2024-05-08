@@ -121,5 +121,23 @@ namespace ADO.NET_implementations
 
             Label1.Text = "Database Table Updated";
         }
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            DataSet ds = (DataSet)Cache["DATASET"];
+            if (ds.HasChanges())
+            {
+                ds.RejectChanges();
+                Cache.Insert("DATASET", ds, null, DateTime.Now.AddDays(1), System.Web.Caching.Cache.NoSlidingExpiration);
+                GetDataFromCache();
+                Label1.Text = "Changes Done";
+                Label1.ForeColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                Label1.Text = "No changes to Undo";
+                Label1.ForeColor = System.Drawing.Color.Red;
+            }
+        }
     }
 }
