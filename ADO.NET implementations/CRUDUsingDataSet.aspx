@@ -13,6 +13,8 @@
         </div>
         <br />
         <asp:Button ID="GetDataFromDb" runat="server" Text="Get Data from Database" OnClick="GetDataFromDb_Click" />
+        &nbsp;&nbsp;&nbsp;
+        <asp:Button ID="Button1" runat="server" Text="Undo" OnClick="Button1_Click" />
         <br />
         <br />
         <br />
