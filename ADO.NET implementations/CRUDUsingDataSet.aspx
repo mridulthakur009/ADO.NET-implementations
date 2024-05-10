@@ -15,6 +15,8 @@
         <asp:Button ID="GetDataFromDb" runat="server" Text="Get Data from Database" OnClick="GetDataFromDb_Click" />
         &nbsp;&nbsp;&nbsp;
         <asp:Button ID="Button1" runat="server" Text="Undo" OnClick="Button1_Click" />
+        &nbsp;&nbsp;&nbsp;
+        <asp:Button ID="Button2" runat="server" Text="Row State" OnClick="Button2_Click" />
         <br />
         <br />
         <br />

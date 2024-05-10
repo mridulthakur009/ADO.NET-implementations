@@ -139,5 +139,21 @@ namespace ADO.NET_implementations
                 Label1.ForeColor = System.Drawing.Color.Red;
             }
         }
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            DataSet ds = (DataSet)Cache["DATASET"];
+
+            foreach(DataRow dr in ds.Tables["Students"].Rows)
+            {
+                if(dr.RowState == DataRowState.Deleted)
+                {
+                    Response.Write(dr["id", DataRowVersion.Original].ToString() + " - " + dr.RowState.ToString()+ "</br>");
+                }
+                else
+                {
+                Response.Write(dr["id"].ToString() + " - " + dr.RowState.ToString() + "</br>");
+                }
+            }
+        }
     }
 }
