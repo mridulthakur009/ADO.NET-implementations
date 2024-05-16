@@ -132,6 +132,7 @@
     <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="LoadBulkData.aspx" />
+    <Content Include="LoadDataFrom1DBToOtherDB.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
@@ -163,6 +164,7 @@
     <Content Include="Site.Master" />
     <Content Include="NotStronglyTypedDS.aspx" />
     <Content Include="StronglyTypedDS.aspx" />
+    <Content Include="TransactionInADO.NET.aspx" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
@@ -216,6 +218,13 @@
     <Compile Include="LoadBulkData.aspx.designer.cs">
       <DependentUpon>LoadBulkData.aspx</DependentUpon>
     </Compile>
+    <Compile Include="LoadDataFrom1DBToOtherDB.aspx.cs">
+      <DependentUpon>LoadDataFrom1DBToOtherDB.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LoadDataFrom1DBToOtherDB.aspx.designer.cs">
+      <DependentUpon>LoadDataFrom1DBToOtherDB.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -250,6 +259,13 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>StudentDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TransactionInADO.NET.aspx.cs">
+      <DependentUpon>TransactionInADO.NET.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="TransactionInADO.NET.aspx.designer.cs">
+      <DependentUpon>TransactionInADO.NET.aspx</DependentUpon>
     </Compile>
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
