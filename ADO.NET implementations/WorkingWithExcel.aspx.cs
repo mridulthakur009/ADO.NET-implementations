@@ -1,95 +1,114 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
+using System.Configuration;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Web;
-using System.Web.Services.Description;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace ADO.NET_implementations
 {
     public partial class WorkingWithExcel : System.Web.UI.Page
     {
-        //Declare Variable (property)  
-        string currFilePath = string.Empty; //File Full Path  
+        // Declare variables
+        string currFilePath = string.Empty;
         string currFileExtension = string.Empty;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             this.btnRead.Click += new EventHandler(btnRead_Click);
         }
+
         protected void btnRead_Click(object sender, EventArgs e)
         {
-            Upload(); //Upload File Method  
+            Upload(); // Upload File Method  
+
             if (this.currFileExtension == ".xlsx" || this.currFileExtension == ".xls")
             {
-                DataTable dt = ReadExcelToTable(currFilePath); //Read Excel File (.XLS and .XLSX Format)  
+                ReadExcelToTable(currFilePath); // Read Excel File (.XLS and .XLSX Format)  
             }
             else if (this.currFileExtension == ".csv")
             {
-                DataTable dt = ReadExcelWithStream(currFilePath); //Read .CSV File  
+                DataTable dt = ReadExcelWithStream(currFilePath); // Read .CSV File  
+                // Use 'dt' DataTable as needed (e.g., bind to GridView)
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
             }
         }
-        ///<summary>  
-        ///Upload File to Temporary Category  
-        ///</summary>  
+
+        /// <summary>  
+        /// Upload File to Temporary Category  
+        /// </summary>  
         private void Upload()
         {
             HttpPostedFile file = this.fileSelect.PostedFile;
-            string fileName = file.FileName;
-            string tempPath = System.IO.Path.GetTempPath(); //Get Temporary File Path  
-            fileName = System.IO.Path.GetFileName(fileName); //Get File Name (not including path)  
-            this.currFileExtension = System.IO.Path.GetExtension(fileName); //Get File Extension  
-            this.currFilePath = tempPath + fileName; //Get File Path after Uploading and Record to Former Declared Global Variable  
-            file.SaveAs(this.currFilePath); //Upload  
+            string fileName = Path.GetFileName(file.FileName);
+            string tempPath = Path.GetTempPath(); // Get Temporary File Path  
+            this.currFileExtension = Path.GetExtension(fileName); // Get File Extension  
+            this.currFilePath = Path.Combine(tempPath, fileName); // Get File Path after Uploading and Record to Former Declared Global Variable  
+            file.SaveAs(this.currFilePath); // Upload  
         }
 
-        ///<summary>  
-        ///Method to Read XLS/XLSX File  
-        ///</summary>  
-        ///<param name="path">Excel File Full Path</param>  
-        ///<returns></returns>  
-        private DataTable ReadExcelToTable(string path)
+        /// <summary>  
+        /// Method to Read XLS/XLSX File  
+        /// </summary>  
+        /// <param name="path">Excel File Full Path</param>  
+        private void ReadExcelToTable(string path)
         {
-            //Connection String  
+            // Connection String  
             string conStr = "";
-            string Extension = this.currFileExtension;
-            switch (Extension)
+            switch (this.currFileExtension)
             {
-                case ".xls": //1997-2003
-                    conStr = "Provider=Microsoft.JET.OLEDB.4.0;Data Source="
-                        + path +
-                        ";Extended Properties=\"Excel 8.0;HDR=YES;\"";
+                case ".xls": // 1997-2003
+                    conStr = $"Provider=Microsoft.JET.OLEDB.4.0;Data Source={path};Extended Properties='Excel 8.0;HDR=YES;'";
                     break;
-                case ".xlsx": //2007
-                    conStr = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" 
-                        + path + 
-                        ";Extended Properties=\"Excel 8.0;HDR=YES;\"";
+                case ".xlsx": // 2007
+                    conStr = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={path};Extended Properties='Excel 12.0 Xml;HDR=YES;'";
                     break;
+                default:
+                    throw new NotSupportedException("File extension not supported.");
             }
-            //string connstring = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties='Excel 8.0;HDR=NO;IMEX=1';"; // Extra blank space cannot appear in Office 2007 and the last version. And we need to pay attention on semicolon.  
-            //string connstring1 = "Provider=Microsoft.ACE.OLEDB.16.0;Data Source=" + path + ";Extended Properties='Excel 8.0;HDR=NO;IMEX=1';";   
 
-            //string connstring2 = "Provider=Microsoft.JET.OLEDB.4.0;Data Source=" + path + ";Extended Properties='Excel 8.0;HDR=NO;IMEX=1';"; //This connection string is appropriate for Office 2007 and the older version. We can select the most suitable connection string according to Office version or our program.  
             using (OleDbConnection conn = new OleDbConnection(conStr))
             {
                 try
                 {
-
                     conn.Open();
-                    DataTable sheetsName = conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new object[] { null, null, null, "Table" }); //Get All Sheets Name  
-                    string firstSheetName = sheetsName.Rows[0][2].ToString(); //Get the First Sheet Name  
-                    string sql = string.Format("SELECT * FROM [{0}],firstSheetName"); //Query String  
-                    OleDbDataAdapter ada = new OleDbDataAdapter(sql, conStr);
-                    DataSet set = new DataSet();
-                    ada.Fill(set);
-                    return set.Tables[0];
+                    DataTable sheetsName = conn.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                    string firstSheetName = sheetsName.Rows[0]["TABLE_NAME"].ToString();
+
+                    // Fix SQL query
+                    string sql = $"SELECT * FROM [{firstSheetName}]";
+
+                    using (OleDbCommand cmd = new OleDbCommand(sql, conn))
+                    {
+                        using (OleDbDataReader reader = cmd.ExecuteReader())
+                        {
+                            ArrayList al = new ArrayList();
+                            while (reader.Read())
+                            {
+                                string str = "";
+                                
+                                int columnCount = reader.FieldCount;   
+                                
+
+                                for (int i = 0; i < columnCount; i++)
+                                {
+                                    string str1 = reader.GetName(i);
+                                    string columnValue = reader[i].ToString();
+                                    str += str1+ ": " + columnValue + " -;- ";
+                                }
+
+                            }
+                        }
+                    }
                 }
-                catch (OleDbException oledb)
+                catch (OleDbException ex)
                 {
-                    throw;
+                    // Handle exceptions
+                    throw new Exception("Error reading Excel file", ex);
                 }
                 finally
                 {
@@ -97,32 +116,43 @@ namespace ADO.NET_implementations
                 }
             }
         }
-        ///<summary>  
-        ///Method to Read CSV Format  
-        ///</summary>  
-        ///<param name="path">Read File Full Path</param>  
-        ///<returns></returns>  
+
+        /// <summary>  
+        /// Method to Read CSV Format  
+        /// </summary>  
+        /// <param name="path">Read File Full Path</param>  
+        /// <returns></returns>  
         private DataTable ReadExcelWithStream(string path)
         {
             DataTable dt = new DataTable();
-            bool isDtHasColumn = false; //Mark if DataTable Generates Column  
-            StreamReader reader = new StreamReader(path, System.Text.Encoding.Default); //Data Stream  
-            while (!reader.EndOfStream)
+            bool isDtHasColumn = false;
+
+            using (StreamReader reader = new StreamReader(path))
             {
-                string message = reader.ReadLine();
-                string[] splitResult = message.Split(new char[] { ',' }, StringSplitOptions.None); //Read One Row and Separate by Comma, Save to Array  
-                DataRow row = dt.NewRow();
-                for (int i = 0; i < splitResult.Length; i++)
+                while (!reader.EndOfStream)
                 {
-                    if (!isDtHasColumn) //If not Generate Column  
+                    string message = reader.ReadLine();
+                    string[] splitResult = message.Split(new char[] { ',' }, StringSplitOptions.None);
+
+                    if (!isDtHasColumn)
                     {
-                        dt.Columns.Add("column" + i, typeof(string));
+                        // Generate columns if not already done
+                        for (int i = 0; i < splitResult.Length; i++)
+                        {
+                            dt.Columns.Add("column" + i, typeof(string));
+                        }
+                        isDtHasColumn = true;
                     }
-                    row[i] = splitResult[i];
+
+                    DataRow row = dt.NewRow();
+                    for (int i = 0; i < splitResult.Length; i++)
+                    {
+                        row[i] = splitResult[i];
+                    }
+                    dt.Rows.Add(row);
                 }
-                dt.Rows.Add(row); //Add Row  
-                isDtHasColumn = true; //Mark the Existed Column after Read the First Row, Not Generate Column after Reading Later Rows  
             }
+
             return dt;
         }
     }

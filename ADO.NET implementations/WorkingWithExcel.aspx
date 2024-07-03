@@ -14,7 +14,11 @@
        <br />
        <br />
        <%-- click this button to run read method--%>  
-       <asp:Button ID="btnRead" runat="server" Text="ReadStart" />  
+       <asp:Button ID="btnRead" runat="server" Text="ReadStart" OnClick="btnRead_Click" />  
+       <br />
+       <br />
+       <asp:GridView ID="GridView1" runat="server">
+       </asp:GridView>
 </div> 
     </form>
 </body>
